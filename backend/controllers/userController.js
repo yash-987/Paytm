@@ -3,6 +3,7 @@ const User = require('../models/userModel');
 const zod = require('zod');
 const { GenerateToken } = require('../config/token');
 const { hashPassword, matchPassword } = require('../config/securePassword');
+const Account = require('../models/accountModel');
 
 
 const signupBody = zod.object({
@@ -44,7 +45,11 @@ const registerUser = expressAsyncHandler(async (req, res) => {
 	});
 
 	const userId = user._id;
-	const token = GenerateToken(userId);
+ await Account.create({
+    userId,
+    balance:1+Math.random()*10000
+  })
+  const token = GenerateToken(userId);
 
 	res.json({
 		message: 'User created successfully',
