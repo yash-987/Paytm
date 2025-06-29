@@ -89,4 +89,47 @@ const signIn = expressAsyncHandler(async (req, res) => {
 	});
 });
 
-module.exports = { registerUser,signIn };
+// update user
+const updateBody = zod.object({
+	password: zod.string().optional(),
+	firstName: zod.string().optional(),
+	lastName:zod.string().optional()
+})
+const updateUser = expressAsyncHandler(async (req, res) => {
+	const { success } = updateBody.safeParse(req.body)
+	if (!success) return res.status(411).json({ message: "Error while updating information" }
+		
+	)
+
+	await User.updateOne(req.body, { id: req.userId })
+	
+	res.json({
+		message:"Updated successfully"
+	})
+})
+
+// search User
+const searchUser = expressAsyncHandler(async (req, res) => {
+	const filter = req.query.filter || "";
+
+	const users = await User.find({
+		$or: [{
+			firstName: {
+				"$regex":filter
+			},
+			lastName: {
+				"$regex":filter
+			}
+		}]
+	})
+
+	res.json({
+		user: users.map(user => ({
+			username: user.username,
+			firstName: user.firstName,
+			lastName: user.lastName,
+			_id:user._id
+		}))
+	})
+})
+module.exports = { registerUser,signIn,updateUser,searchUser };
