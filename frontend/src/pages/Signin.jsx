@@ -8,6 +8,7 @@ import { useSetRecoilState } from "recoil";
 import { UserAtom } from "../store/user";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
 
 function Signin() {
   const [inputs, setInputs] = useState({
@@ -15,14 +16,15 @@ function Signin() {
     password: "",
   });
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const setUser = useSetRecoilState(UserAtom);
-  const handleLogin = async () => {
+ const handleLogin = async () => {
     if (!inputs.email || !inputs.password) {
-      console.log("Please fill all the fields");
+      toast.warning("Please fill all the inputs");
       return;
     }
-
+    setLoading(true);
     try {
       const config = {
         headers: {
@@ -39,11 +41,22 @@ function Signin() {
         config,
       );
 
-      localStorage.setItem('user-info',JSON.stringify(data));
+
+      toast.success('Login Success')
+      localStorage.setItem("user-info", JSON.stringify(data));
       setUser(data);
-      navigate("/dashboard");
+
+      
+
+      
+      setTimeout(()=>{
+        navigate('/dashboard')
+      },800)
+      setLoading(false);
     } catch (error) {
-      console.log(error);
+      toast.error("Internal server error");
+
+      setLoading(false);
     }
   };
   return (
@@ -65,7 +78,35 @@ function Signin() {
             label="Password"
           />
           <div className="pt-4">
-            <Button label={"Sign in "} onClick={handleLogin} />
+            <Button
+              label={
+                loading ? (
+                  <svg
+                    className="h-5 w-5 animate-spin text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v8H4z"
+                    />
+                  </svg>
+                ) : (
+                  "Sign In"
+                )
+              }
+              onClick={handleLogin}
+            />
           </div>
           <BottomWarning
             label={"Don't have an account?"}
@@ -74,6 +115,17 @@ function Signin() {
           />
         </div>
       </div>
+      <ToastContainer
+        position="bottom-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark" // or "dark"
+      />
     </div>
   );
 }

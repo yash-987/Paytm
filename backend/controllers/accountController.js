@@ -10,6 +10,7 @@ const getBalance = expressAsyncHandler(async (req, res) => {
       message: "No account with this userId",
     });
   res.json({
+    userId:account.userId,
     balance: account.balance,
   });
 });
