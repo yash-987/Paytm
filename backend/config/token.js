@@ -13,8 +13,7 @@ const GenerateToken = (id) => {
 }
 
 const DecodeToken = (token) => {
-    const decoded = jwt.verify(token, jwt_secret);
-    return decoded;
+    return jwt.verify(token, jwt_secret)
 }
 
 
